@@ -1,9 +1,11 @@
 # Intro - UNIWA 2020 CTF
 
 This is an introductory pwning challenge. On running a simple prompt asks for a string input and greets you based on your input:
+
 ![](img/prompt.png)
 
 Lets open it up with Ghidra and analyze it:
+
 ![](img/ghidra.png)
 
 We see 2 local variables, a string with 28 characters (```buffer```) and an int (```x```) variable initialized with ```0xdeadbeef @ main+18``` .
@@ -13,6 +15,7 @@ A ```scanf``` is performed and the output is placed into ```buffer```.
 Then oddly enough if the value of ```x``` has changed and is compared to ```0xc0debabe @ main+66``` (2) and if equal the ```win``` function is called, which provides with with the flag.
 
 Let's debug with GDB:
+
 ![](img/gdb.png)
 The stack frame it's exactly 32 byes long, just enough to accomodate the 28 byte buffer and the 4 byte integer. Further more we can construct the stack layout. We know that the variable x resides in the address of
 ```rbp-0x4``` and the buffer address resides in ```rbp-0x20 or rsp```.
