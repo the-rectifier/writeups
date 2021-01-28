@@ -17,6 +17,7 @@ Then oddly enough if the value of ```x``` has changed and is compared to ```0xc0
 Let's debug with GDB:
 
 ![](img/gdb.png)
+
 The stack frame it's exactly 32 byes long, just enough to accomodate the 28 byte buffer and the 4 byte integer. Further more we can construct the stack layout. We know that the variable x resides in the address of
 ```rbp-0x4``` and the buffer address resides in ```rbp-0x20 or rsp```.
 
