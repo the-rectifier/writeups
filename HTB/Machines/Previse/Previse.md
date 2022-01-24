@@ -55,6 +55,7 @@ we can bypass the redirection and access the website directly!
 ![](./images/Pasted%20image%2020211224032506.png)
 
 And we are in!
+
 ![](./images/Pasted%20image%2020211224032556.png)
 
 We can now try creating a user to have permanent access to the website.
