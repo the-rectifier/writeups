@@ -161,7 +161,7 @@ undefined8 main(void)
 }
 ```
 
-A simple loop that calculates some characters and prints them to null. Instead of reversing it let's just debug it and check the contents of `b` just before the call to `puts`.
+A simple loop that calculates some characters and prints them to `/dev/null`. Instead of reversing it let's just debug it and check the contents of `b` just before the call to `puts`.
 
 ![](assets/writeup/2022-05-17-19-37-07-image.png)
 
